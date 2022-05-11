@@ -1,0 +1,62 @@
+library(lmtest) # For testing linear regression coefficients
+library(sandwich) # For heteroskedasticity-robust standard errors
+library(ggplot2) # For plots
+library(dplyr) # For data manipulation
+library(car)
+library(AER)
+library(tidyverse)
+library(swdft)
+library(readxl)
+rm(list=ls())
+
+#sine wave fitting
+
+setwd("/Users/sambennett/Desktop/Sam's Folders/Sports Analytics/Projects/Rebuilding Cycles")
+wp <- read_excel("winpct.xlsx")
+year <- wp$Year
+team <- wp$(insert team)
+reg <- nls(team~C+amplitude*sin(frequency*year + phase), data=wp, start=list(C=5, amplitude=1, frequency=.5, phase=1))
+summary(reg)
+freq <- coef(summary(reg))["frequency", "Estimate"]
+period <- 2*pi/freq
+period
+
+sd <- read_excel("sd_mean.xlsx")
+year <- sd$Year
+team <- sd$(insert team)
+reg <- nls(team~C+amplitude*sin(frequency*year + phase), data=sd, start=list(C=.5, amplitude=2, frequency=3, phase=1))
+summary(reg)
+freq <- coef(summary(reg))["frequency", "Estimate"]
+period <- 2*pi/freq
+period
+
+#regressions
+
+setwd("/Users/sambennett/Desktop/Sam's Folders/Sports Analytics/Projects/Rebuilding Cycles")
+sd <- read_excel("RebuiltMarket.xlsx")
+marketscore <- sd$`Market Score`
+win_period <- sd$`Win % Period Value`
+payroll_period <- sd$`Payroll from Mean Period Value`
+hard_period <- sd$`Hard-Coded Period Value`
+large <- sd$`Small (0) / Large (1)`
+pop <- sd$Population
+win <- sd$`Win %`
+front_office <- sd$`Bad (0) / Good (1) FO`
+
+winreg <- lm(win_period~large)
+payreg <- lm(payroll_period~large)
+own <- lm(hard_period~large)
+winpctreg <- lm(win~large)
+summary(winreg)
+summary(payreg)
+summary(own)
+summary(winpctreg)
+
+winreg1 <- lm(win_period~large+front_office)
+payreg1 <- lm(payroll_period~large+front_office)
+own1 <- lm(hard_period~large+front_office)
+winpctreg1 <- lm(win~large+front_office)
+summary(winreg1)
+summary(payreg1)
+summary(own1)
+summary(winpctreg1)
